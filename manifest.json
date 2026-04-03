@@ -1,0 +1,15 @@
+{
+  "short_name": "Свадьба",
+  "name": "Анастасия и Никита: Свадебная Галерея",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3656/3656830.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#fefcf9",
+  "background_color": "#fefcf9"
+}
