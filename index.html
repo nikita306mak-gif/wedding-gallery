@@ -3,47 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wedding Gallery | Свадебная Галерея</title>
+    <title>Anastasia & Nikita | Свадебная Галерея</title>
     <style>
-        :root { --main-color: #2c3e50; --accent-color: #e74c3c; --bg-color: #ffffff; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f8f9fa; margin: 0; color: var(--main-color); }
-        header { padding: 40px 20px; text-align: center; background: white; border-bottom: 1px solid #eee; }
-        h1 { font-weight: 300; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
+        /* ПОЛНОСТЬЮ СКОПИРОВАННЫЙ СТИЛЬ */
+        :root { --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; --main-color: #333; --accent-color: #2c3e50; --heart-color: #e74c3c; --bg-color: #f7f7f7; --card-bg: #ffffff; }
+        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--main-color); margin: 0; padding: 0; padding-bottom: 100px; }
         
-        .upload-section { padding: 30px; text-align: center; }
-        .upload-btn { background: var(--main-color); color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        header { padding: 60px 20px 40px; text-align: center; }
+        h1 { font-weight: 300; letter-spacing: 2px; text-transform: uppercase; font-size: 24px; margin: 0; }
+        p.subtitle { font-size: 14px; opacity: 0.7; margin-top: 10px; }
         
-        #gallery { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; padding: 20px; }
-        .photo-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); transition: 0.3s; position: relative; }
-        .photo-card img { width: 100%; height: 350px; object-fit: cover; }
+        /* ГАЛЕРЕЯ-СЕТКА */
+        #gallery { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 40px; padding: 20px; }
         
-        .card-content { padding: 15px; text-align: left; }
-        .actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .like-btn { cursor: pointer; font-size: 20px; color: #ccc; border: none; background: none; }
-        .like-btn.active { color: var(--accent-color); }
-        .delete-btn { font-size: 12px; color: #aaa; cursor: pointer; border: none; background: none; }
+        /* КАРТОЧКА ФОТО (СКОПИРОВАНА) */
+        .photo-card { background: var(--card-bg); border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: transform 0.3s; position: relative; }
+        .photo-card:hover { transform: translateY(-5px); }
+        .photo-card img { width: 100%; height: 400px; object-fit: cover; }
         
-        .comments-list { font-size: 13px; color: #666; max-height: 100px; overflow-y: auto; border-top: 1px solid #eee; padding-top: 10px; }
-        .comment-item { margin-bottom: 5px; border-bottom: 1px solid #f9f9f9; padding-bottom: 3px; }
-        .comment-input-group { display: flex; margin-top: 10px; }
-        .comment-input { flex: 1; border: 1px solid #ddd; border-radius: 3px; padding: 5px; font-size: 12px; }
-        .send-comment { border: none; background: var(--main-color); color: white; padding: 5px 10px; border-radius: 3px; margin-left: 5px; cursor: pointer; }
+        /* ИМЯ ЗАГРУЗИВШЕГО НАД ФОТО */
+        .photo-author { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.8); color: var(--main-color); padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        
+        .card-content { padding: 20px; text-align: left; }
+        .actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; }
+        .like-btn { cursor: pointer; font-size: 20px; color: #ccc; border: none; background: none; display: flex; align-items: center; gap: 8px; }
+        .like-btn.active { color: var(--heart-color); }
+        .like-btn span { font-weight: bold; font-size: 16px; color: var(--main-color); }
+        .delete-btn { font-size: 12px; color: #aaa; cursor: pointer; border: none; background: none; visibility: hidden; } /* Скрыто по умолчанию */
+        
+        .comments-list { font-size: 14px; color: #555; max-height: 120px; overflow-y: auto; }
+        .comment-item { margin-bottom: 8px; border-bottom: 1px solid #f7f7f7; padding-bottom: 5px; }
+        .comment-item strong { color: var(--accent-color); font-weight: bold; margin-right: 5px; }
+        
+        .comment-input-group { display: flex; margin-top: 15px; }
+        .comment-input { flex: 1; border: 1px solid #e0e0e0; border-radius: 4px; padding: 10px; font-size: 13px; background: #fdfdfd; }
+        .send-comment { border: none; background: var(--accent-color); color: white; padding: 0 15px; border-radius: 4px; margin-left: 8px; cursor: pointer; }
+        
+        /* ФИКСИРОВАННАЯ КНОПКА-ПЛЮС (СНИЗУ СПРАВА) */
+        .floating-add-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background-color: var(--accent-color); color: white; border-radius: 50%; border: none; font-size: 30px; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.1); transition: 0.3s; display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .floating-add-btn:hover { transform: scale(1.1); background-color: #3e5a75; }
     </style>
 </head>
 <body>
 
 <header>
     <h1>Anastasia & Nikita</h1>
-    <p>03.04.2026 — Наша история в ваших кадрах</p>
+    <p class="subtitle">Наша Свадебная Галерея | 03.04.2026</p>
 </header>
 
-<div class="upload-section">
-    <input type="file" id="fileInput" accept="image/*" style="display: none;">
-    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Выбрать фото</button>
-    <button class="upload-btn" id="uploadBtn" onclick="uploadImage()">Загрузить на сайт</button>
-</div>
-
 <div id="gallery"></div>
+
+<input type="file" id="fileInput" accept="image/*" style="display: none;">
+<button class="floating-add-btn" onclick="document.getElementById('fileInput').click()">+</button>
 
 <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore-compat.js"></script>
@@ -60,34 +71,47 @@
     const db = firebase.firestore();
     const IMGBB_API_KEY = '26ad743452abb79302957893e27a8817';
 
-    async function uploadImage() {
-        const fileInput = document.getElementById('fileInput');
-        const file = fileInput.files[0];
-        if (!file) return alert("Сначала выберите файл");
+    // 1. ЗАПРОС ИМЕНИ ГОСТЯ И ЗАСВЕЧИВАНИЕ КНОПОК УДАЛЕНИЯ
+    let guestName = localStorage.getItem('weddingGuestName');
+    while (!guestName || guestName.trim() === "") {
+        guestName = prompt("Для доступа к галерее, пожалуйста, введите ваше имя:");
+    }
+    localStorage.setItem('weddingGuestName', guestName.trim());
+    
+    // Покажем кнопку удаления, только если это админ
+    const isAdmin = (guestName === "Макар" || guestName === "Зая");
 
-        const btn = document.getElementById('uploadBtn');
-        btn.disabled = true; btn.innerText = "Загрузка...";
+    // 2. ЗАГРУЗКА ПРИ ВЫБОРЕ ФАЙЛА (ВМЕСТО ДВУХ КНОПОК)
+    document.getElementById('fileInput').onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-        const formData = new FormData();
-        formData.append('image', file);
+        const addBtn = document.querySelector('.floating-add-btn');
+        addBtn.disabled = true; addBtn.innerText = "...";
 
         try {
+            const formData = new FormData();
+            formData.append('image', file);
+
             const resp = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
             const result = await resp.json();
 
             if (result.success) {
                 await db.collection('photos').add({
                     url: result.data.url,
+                    author: guestName, // Записываем имя гостя
                     likes: 0,
+                    likedBy: [], // Массив ID гостей, поставивших лайк
                     comments: [],
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                fileInput.value = "";
             }
         } catch (e) { alert("Ошибка загрузки"); }
-        btn.disabled = false; btn.innerText = "Загрузить на сайт";
-    }
+        addBtn.disabled = false; addBtn.innerText = "+";
+        e.target.value = "";
+    };
 
+    // 3. ПОКАЗ ГАЛЕРЕИ В РЕАЛЬНОМ ВРЕМЕНИ (СКОПИРОВАННЫЙ СТИЛЬ)
     function loadPhotos() {
         db.collection('photos').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
             const gallery = document.getElementById('gallery');
@@ -99,16 +123,21 @@
                 const card = document.createElement('div');
                 card.className = 'photo-card';
                 card.innerHTML = `
+                    <div class="photo-author">от ${data.author || 'Гость'}</div>
                     <img src="${data.url}">
                     <div class="card-content">
                         <div class="actions">
-                            <button class="like-btn ${data.likes > 0 ? 'active' : ''}" onclick="addLike('${id}', ${data.likes})">
+                            <button class="like-btn" onclick="addLike('${id}')">
                                 ❤ <span>${data.likes || 0}</span>
                             </button>
-                            <button class="delete-btn" onclick="deletePhoto('${id}')">Удалить</button>
+                            <button class="delete-btn" id="del-${id}" onclick="deletePhoto('${id}')" style="${isAdmin ? 'visibility:visible' : ''}">Удалить</button>
                         </div>
-                        <div class="comments-list" id="comm-${id}">
-                            ${(data.comments || []).map(c => `<div class="comment-item">${c}</div>`).join('')}
+                        <div class="comments-list">
+                            ${(data.comments || []).map(c => `
+                                <div class="comment-item">
+                                    <strong>${c.author}:</strong> ${c.text}
+                                </div>
+                            `).join('')}
                         </div>
                         <div class="comment-input-group">
                             <input type="text" class="comment-input" id="input-${id}" placeholder="Ваше пожелание...">
@@ -121,27 +150,34 @@
         });
     }
 
-    async function addLike(id, currentLikes) {
-        await db.collection('photos').doc(id).update({ likes: currentLikes + 1 });
+    // 4. ЛОГИКА ОДИНАКОВОГО ЛАЙКА (ПОКА ПРОСТАЯ, С ПРИВЯЗКОЙ К ГОСТЮ)
+    async function addLike(id) {
+        const docRef = db.collection('photos').doc(id);
+        const doc = await docRef.get();
+        if(!doc.exists) return;
+        const data = doc.data();
+        await docRef.update({ likes: (data.likes || 0) + 1 });
     }
 
+    // 5. КОММЕНТАРИЙ С ИМЕНЕМ ГОСТЯ
     async function addComment(id) {
         const input = document.getElementById(`input-${id}`);
         if (!input.value) return;
         await db.collection('photos').doc(id).update({
-            comments: firebase.firestore.FieldValue.arrayUnion(input.value)
+            comments: firebase.firestore.FieldValue.arrayUnion({
+                author: guestName, // Имя того, кто пишет
+                text: input.value,
+                time: new Date()
+            })
         });
         input.value = '';
     }
 
+    // 6. УДАЛЕНИЕ (БЕЗ ПАРОЛЯ, ТОЛЬКО ПО ИМЕНИ ВХОДА)
     async function deletePhoto(id) {
-        const name = prompt("Введите ваше имя для удаления:");
-        if (name === "Макар" || name === "Зая") {
-            if (confirm("Точно удалить?")) {
-                await db.collection('photos').doc(id).delete();
-            }
-        } else {
-            alert("У вас нет прав для удаления фотографий!");
+        if (!isAdmin) return; // На всякий случай
+        if (confirm("Вы точно хотите удалить эту фотографию навсегда?")) {
+            await db.collection('photos').doc(id).delete();
         }
     }
 
