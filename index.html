@@ -2,23 +2,150 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Wedding Gallery</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Gallery | Свадебная Галерея</title>
+    <style>
+        :root { --main-color: #2c3e50; --accent-color: #e74c3c; --bg-color: #ffffff; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f8f9fa; margin: 0; color: var(--main-color); }
+        header { padding: 40px 20px; text-align: center; background: white; border-bottom: 1px solid #eee; }
+        h1 { font-weight: 300; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
+        
+        .upload-section { padding: 30px; text-align: center; }
+        .upload-btn { background: var(--main-color); color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        
+        #gallery { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; padding: 20px; }
+        .photo-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); transition: 0.3s; position: relative; }
+        .photo-card img { width: 100%; height: 350px; object-fit: cover; }
+        
+        .card-content { padding: 15px; text-align: left; }
+        .actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .like-btn { cursor: pointer; font-size: 20px; color: #ccc; border: none; background: none; }
+        .like-btn.active { color: var(--accent-color); }
+        .delete-btn { font-size: 12px; color: #aaa; cursor: pointer; border: none; background: none; }
+        
+        .comments-list { font-size: 13px; color: #666; max-height: 100px; overflow-y: auto; border-top: 1px solid #eee; padding-top: 10px; }
+        .comment-item { margin-bottom: 5px; border-bottom: 1px solid #f9f9f9; padding-bottom: 3px; }
+        .comment-input-group { display: flex; margin-top: 10px; }
+        .comment-input { flex: 1; border: 1px solid #ddd; border-radius: 3px; padding: 5px; font-size: 12px; }
+        .send-comment { border: none; background: var(--main-color); color: white; padding: 5px 10px; border-radius: 3px; margin-left: 5px; cursor: pointer; }
+    </style>
 </head>
 <body>
 
-    <h1>Наша Свадебная Галерея</h1>
-    
-    <div class="controls">
-        <input type="file" id="fileInput" accept="image/*">
-        <button id="uploadBtn">Загрузить фото</button>
-    </div>
+<header>
+    <h1>Anastasia & Nikita</h1>
+    <p>03.04.2026 — Наша история в ваших кадрах</p>
+</header>
 
-    <div id="gallery"></div>
+<div class="upload-section">
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Выбрать фото</button>
+    <button class="upload-btn" id="uploadBtn" onclick="uploadImage()">Загрузить на сайт</button>
+</div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore-compat.js"></script>
+<div id="gallery"></div>
 
-    <script src="script.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBkQWaNGF7MISkpUrb67oetzF4O5BYjONQ",
+        authDomain: "wedding-gallery02.firebaseapp.com",
+        projectId: "wedding-gallery02",
+        storageBucket: "wedding-gallery02.firebasestorage.app",
+        appId: "1:476761207207:web:ed0a691a3006c8d2780682"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const IMGBB_API_KEY = '26ad743452abb79302957893e27a8817';
+
+    async function uploadImage() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        if (!file) return alert("Сначала выберите файл");
+
+        const btn = document.getElementById('uploadBtn');
+        btn.disabled = true; btn.innerText = "Загрузка...";
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const resp = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+            const result = await resp.json();
+
+            if (result.success) {
+                await db.collection('photos').add({
+                    url: result.data.url,
+                    likes: 0,
+                    comments: [],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                fileInput.value = "";
+            }
+        } catch (e) { alert("Ошибка загрузки"); }
+        btn.disabled = false; btn.innerText = "Загрузить на сайт";
+    }
+
+    function loadPhotos() {
+        db.collection('photos').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const id = doc.id;
+                
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.innerHTML = `
+                    <img src="${data.url}">
+                    <div class="card-content">
+                        <div class="actions">
+                            <button class="like-btn ${data.likes > 0 ? 'active' : ''}" onclick="addLike('${id}', ${data.likes})">
+                                ❤ <span>${data.likes || 0}</span>
+                            </button>
+                            <button class="delete-btn" onclick="deletePhoto('${id}')">Удалить</button>
+                        </div>
+                        <div class="comments-list" id="comm-${id}">
+                            ${(data.comments || []).map(c => `<div class="comment-item">${c}</div>`).join('')}
+                        </div>
+                        <div class="comment-input-group">
+                            <input type="text" class="comment-input" id="input-${id}" placeholder="Ваше пожелание...">
+                            <button class="send-comment" onclick="addComment('${id}')">➤</button>
+                        </div>
+                    </div>
+                `;
+                gallery.appendChild(card);
+            });
+        });
+    }
+
+    async function addLike(id, currentLikes) {
+        await db.collection('photos').doc(id).update({ likes: currentLikes + 1 });
+    }
+
+    async function addComment(id) {
+        const input = document.getElementById(`input-${id}`);
+        if (!input.value) return;
+        await db.collection('photos').doc(id).update({
+            comments: firebase.firestore.FieldValue.arrayUnion(input.value)
+        });
+        input.value = '';
+    }
+
+    async function deletePhoto(id) {
+        const name = prompt("Введите ваше имя для удаления:");
+        if (name === "Макар" || name === "Зая") {
+            if (confirm("Точно удалить?")) {
+                await db.collection('photos').doc(id).delete();
+            }
+        } else {
+            alert("У вас нет прав для удаления фотографий!");
+        }
+    }
+
+    loadPhotos();
+</script>
 </body>
 </html>
